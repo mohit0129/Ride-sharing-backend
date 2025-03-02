@@ -1,13 +1,13 @@
-//models/User.js
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-const jwt = require("jsonwebtoken");
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+
+const { Schema } = mongoose;
 
 const userSchema = new Schema(
   {
     role: {
       type: String,
-      enum: ["customer", "captain"],
+      enum: ["customer", "rider"],
       required: true,
     },
     phone: {
@@ -43,4 +43,4 @@ userSchema.methods.createRefreshToken = function () {
 };
 
 const User = mongoose.model("User", userSchema);
-module.exports = User;
+export default User;

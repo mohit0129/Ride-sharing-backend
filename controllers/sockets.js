@@ -1,64 +1,54 @@
-//controllers/socket.js
-const geolib = require("geolib");
-const User = require("../models/User");
-const Ride = require("../models/Ride"); // Import Ride model
-const jwt = require("jsonwebtoken");
+import geolib from "geolib";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import Ride from "../models/Ride.js";
+
+const onDutyRiders = new Map();
 
 const handleSocketConnection = (io) => {
-  const onDutyCaptains = {};
-
   io.use(async (socket, next) => {
-    const token = socket.handshake.headers.access_token;
-    if (!token) {
-      return next(new Error("Authentication invalid: No token provided"));
-    }
     try {
+      const token = socket.handshake.headers.access_token;
+      if (!token) return next(new Error("Authentication invalid: No token"));
+
       const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       const user = await User.findById(payload.id);
-      if (!user) {
-        return next(new Error("Authentication invalid: User not found"));
-      }
+      if (!user) return next(new Error("Authentication invalid: User not found"));
+
       socket.user = { id: payload.id, role: user.role };
       next();
     } catch (error) {
-      console.log("Socket Error", error);
-      return next(
-        new Error("Authentication invalid: Token verification failed")
-      );
+      console.error("Socket Auth Error:", error);
+      next(new Error("Authentication invalid: Token verification failed"));
     }
   });
 
   io.on("connection", (socket) => {
     const user = socket.user;
-    console.log("User Joined🔴: ", user);
+    console.log(`User Joined: ${user.id} (${user.role})`);
 
-    if (user.role === "captain") {
+    if (user.role === "rider") {
       socket.on("goOnDuty", (coords) => {
-        onDutyCaptains[user.id] = { socketId: socket.id, coords };
+        onDutyRiders.set(user.id, { socketId: socket.id, coords });
         socket.join("onDuty");
-        console.log(`Captain ${user.id} is now on duty.🫡`);
-
-        updateNearbyCaptains();
+        console.log(`rider ${user.id} is now on duty.`);
+        updateNearbyriders();
       });
 
       socket.on("goOffDuty", () => {
-        delete onDutyCaptains[user.id];
+        onDutyRiders.delete(user.id);
         socket.leave("onDuty");
-        console.log(`Captain ${user.id} is now off duty.😪`);
-
-        updateNearbyCaptains();
+        console.log(`rider ${user.id} is now off duty.`);
+        updateNearbyriders();
       });
 
-      // Update captain's location
       socket.on("updateLocation", (coords) => {
-        if (onDutyCaptains[user.id]) {
-          onDutyCaptains[user.id].coords = coords;
-          console.log(`Captain ${user.id} updated location.`);
-          updateNearbyCaptains();
-
-          // Notify subscribed users about captain's location update
-          socket.to(`captain_${user.id}`).emit("captainLocationUpdate", {
-            captainId: user.id,
+        if (onDutyRiders.has(user.id)) {
+          onDutyRiders.get(user.id).coords = coords;
+          console.log(`rider ${user.id} updated location.`);
+          updateNearbyriders();
+          socket.to(`rider_${user.id}`).emit("riderLocationUpdate", {
+            riderId: user.id,
             coords,
           });
         }
@@ -68,80 +58,38 @@ const handleSocketConnection = (io) => {
     if (user.role === "customer") {
       socket.on("subscribeToZone", (customerCoords) => {
         socket.user.coords = customerCoords;
-
-        const nearbyCaptains = Object.values(onDutyCaptains)
-          .filter((captain) =>
-            geolib.isPointWithinRadius(captain.coords, customerCoords, 60000)
-          )
-          .map((captain) => ({
-            id: captain.socketId,
-            coords: captain.coords,
-          }));
-
-        socket.emit("nearbyCaptains", nearbyCaptains);
+        sendNearbyRiders(socket, customerCoords);
       });
 
-      socket.on("searchCaptain", async (rideId) => {
+      socket.on("searchrider", async (rideId) => {
         try {
-          const ride = await Ride.findById(rideId).populate("customer captain");
-          if (!ride) {
-            socket.emit("error", { message: "Ride not found" });
-            return;
-          }
+          const ride = await Ride.findById(rideId).populate("customer rider");
+          if (!ride) return socket.emit("error", { message: "Ride not found" });
 
           const { latitude: pickupLat, longitude: pickupLon } = ride.pickup;
 
-          const findNearbyCaptains = () => {
-            return Object.values(onDutyCaptains)
-              .map((captain) => ({
-                ...captain,
-                distance: geolib.getDistance(captain.coords, {
-                  latitude: pickupLat,
-                  longitude: pickupLon,
-                }),
-              }))
-              .filter((captain) => captain.distance <= 60000) // 60 km radius
-              .sort((a, b) => a.distance - b.distance);
-          };
-
-          const emitNearbyCaptains = () => {
-            const nearbyCaptains = findNearbyCaptains();
-            if (nearbyCaptains.length > 0) {
-              socket.emit("nearbyCaptains", nearbyCaptains);
-              nearbyCaptains.forEach((captain) => {
-                socket.to(captain.socketId).emit("rideOffer", ride);
-              });
-            } else {
-              console.log("No captains nearby, retrying...");
-            }
-            return nearbyCaptains;
-          };
-
-          const MAX_RETRIES = 20;
           let retries = 0;
           let rideAccepted = false;
           let canceled = false;
+          const MAX_RETRIES = 20;
 
           const retrySearch = async () => {
-            retries++;
             if (canceled) return;
+            retries++;
 
-            const captains = emitNearbyCaptains();
-            if (captains.length > 0 || retries >= MAX_RETRIES) {
+            const riders = sendNearbyRiders(socket, { latitude: pickupLat, longitude: pickupLon }, ride);
+            if (riders.length > 0 || retries >= MAX_RETRIES) {
               clearInterval(retryInterval);
-
               if (!rideAccepted && retries >= MAX_RETRIES) {
                 await Ride.findByIdAndDelete(rideId);
-                socket.emit("error", {
-                  message: "No captains found for your ride within 5 minutes.",
-                });
+                socket.emit("error", { message: "No riders found within 5 minutes." });
               }
             }
           };
 
           const retryInterval = setInterval(retrySearch, 10000);
 
-          socket.on("rideAccepted", async () => {
+          socket.on("rideAccepted", () => {
             rideAccepted = true;
             clearInterval(retryInterval);
           });
@@ -149,103 +97,80 @@ const handleSocketConnection = (io) => {
           socket.on("cancelRide", async () => {
             canceled = true;
             clearInterval(retryInterval);
-
             await Ride.findByIdAndDelete(rideId);
-            socket.emit("rideCanceled", {
-              message: "Your ride has been canceled",
-            });
+            socket.emit("rideCanceled", { message: "Ride canceled" });
 
-            if (ride.captain) {
-              const captainSocket = getCaptainSocket(ride.captain._id);
-              if (captainSocket) {
-                captainSocket.emit("rideCanceled", {
-                  message: `The ride with customer ${user.id} has been canceled.`,
-                });
-              } else {
-                console.log(`Captain not found for ride ${rideId}`);
-              }
-            } else {
-              console.log(`No captain associated with ride ${rideId}`);
+            if (ride.rider) {
+              const riderSocket = getRiderSocket(ride.rider._id);
+              riderSocket?.emit("rideCanceled", { message: `Customer ${user.id} canceled the ride.` });
             }
-
-            console.log(`Customer ${user.id} canceled the ride ${rideId}`);
+            console.log(`Customer ${user.id} canceled ride ${rideId}`);
           });
         } catch (error) {
-          console.error("Error searching for captain:", error);
-          socket.emit("error", { message: "Error searching for captain" });
-          details: error.message // Add more detailed error info
+          console.error("Error searching for rider:", error);
+          socket.emit("error", { message: "Error searching for rider" });
         }
       });
     }
 
-    // Subscribe to captain's location updates
-    socket.on("subscribeToCaptainLocation", (captainId) => {
-      const captain = onDutyCaptains[captainId];
-      console.log(onDutyCaptains, captain);
-      if (captain) {
-        socket.join(`captain_${captainId}`);
-        socket.emit("captainLocationUpdate", {
-          captainId,
-          coords: captain.coords,
-        });
-        console.log(
-          `User ${user.id} subscribed to Captain ${captainId}'s location.`
-        );
+    socket.on("subscribeToriderLocation", (riderId) => {
+      const rider = onDutyRiders.get(riderId);
+      if (rider) {
+        socket.join(`rider_${riderId}`);
+        socket.emit("riderLocationUpdate", { riderId, coords: rider.coords });
+        console.log(`User ${user.id} subscribed to rider ${riderId}'s location.`);
       }
     });
 
     socket.on("subscribeRide", async (rideId) => {
       socket.join(`ride_${rideId}`);
       try {
-        const rideData = await Ride.findById(rideId).populate(
-          "customer captain"
-        );
+        const rideData = await Ride.findById(rideId).populate("customer rider");
         socket.emit("rideData", rideData);
       } catch (error) {
-        socket.error("Failed to receive data");
+        socket.emit("error", { message: "Failed to receive ride data" });
       }
     });
 
     socket.on("disconnect", () => {
-      if (user.role === "captain") {
-        delete onDutyCaptains[user.id];
-        updateNearbyCaptains(); // Add this to notify customers
-      } else if (user.role === "customer") {
-        console.log(`Customer ${user.id} disconnected.`);
-      }
+      if (user.role === "rider") onDutyRiders.delete(user.id);
+      console.log(`${user.role} ${user.id} disconnected.`);
     });
 
-    function updateNearbyCaptains() {
+    function updateNearbyriders() {
       io.sockets.sockets.forEach((socket) => {
         if (socket.user?.role === "customer") {
-          const customerCoords = socket.user?.coords;
-          if (customerCoords) {
-            const nearbyCaptains = Object.values(onDutyCaptains)
-              .filter((captain) =>
-                geolib.isPointWithinRadius(
-                  captain.coords,
-                  customerCoords,
-                  60000
-                )
-              )
-              .map((captain) => ({
-                id: captain.socketId,
-                coords: captain.coords,
-              }));
-            console.log("nearbyCaptains", nearbyCaptains)
-            socket.emit("nearbyCaptains", nearbyCaptains);
-          }
+          const customerCoords = socket.user.coords;
+          if (customerCoords) sendNearbyRiders(socket, customerCoords);
         }
       });
     }
 
-    function getCaptainSocket(captainId) {
-      const captain = Object.values(onDutyCaptains).find(
-        (captain) => captain.userId.toString() === captainId.toString()
-      );
-      return captain ? io.sockets.sockets.get(captain.socketId) : null;
+    function sendNearbyRiders(socket, location, ride = null) {
+      const nearbyriders = Array.from(onDutyRiders.values())
+        .map((rider) => ({
+          ...rider,
+          distance: geolib.getDistance(rider.coords, location),
+        }))
+        .filter((rider) => rider.distance <= 60000)
+        .sort((a, b) => a.distance - b.distance);
+
+      socket.emit("nearbyriders", nearbyriders);
+
+      if (ride) {
+        nearbyriders.forEach((rider) => {
+          io.to(rider.socketId).emit("rideOffer", ride);
+        });
+      }
+
+      return nearbyriders;
+    }
+
+    function getRiderSocket(riderId) {
+      const rider = onDutyRiders.get(riderId);
+      return rider ? io.sockets.sockets.get(rider.socketId) : null;
     }
   });
 };
 
-module.exports = handleSocketConnection;
+export default handleSocketConnection;

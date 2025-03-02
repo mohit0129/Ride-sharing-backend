@@ -1,9 +1,9 @@
-//routes/auth.js
-const express = require("express");
+import express from 'express';
+import { refreshToken, auth } from '../controllers/auth.js';
+
 const router = express.Router();
-const { refreshToken, auth } = require("../controllers/auth");
 
-router.post("/refresh-token", refreshToken);
-router.post("/signin", auth);
+router.post('/refresh-token', refreshToken);
+router.post('/signin', auth);
 
-module.exports = router;
+export default router;

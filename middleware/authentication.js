@@ -1,7 +1,7 @@
-//middleware/authentication.js
-const jwt = require("jsonwebtoken");
-const { UnauthenticatedError } = require("../errors");
-const User = require("../models/User");
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import NotFoundError from "../errors/not-found.js";
+import UnauthenticatedError from "../errors/unauthenticated.js";
 
 const auth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -26,4 +26,4 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = auth;
+export default auth;

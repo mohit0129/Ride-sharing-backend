@@ -1,14 +1,13 @@
-//controllers/ride.js
-const Ride = require("../models/Ride");
-const { BadRequestError } = require("../errors");
-const { StatusCodes } = require("http-status-codes");
-const {
+import Ride from "../models/Ride.js";
+import { BadRequestError, NotFoundError } from "../errors/index.js";
+import { StatusCodes } from "http-status-codes";
+import {
   calculateDistance,
   calculateFare,
   generateOTP,
-} = require("../utils/mapUtils");
+} from "../utils/mapUtils.js";
 
-const createRide = async (req, res) => {
+export const createRide = async (req, res) => {
   const { vehicle, pickup, drop } = req.body;
 
   if (!vehicle || !pickup || !drop) {
@@ -66,8 +65,8 @@ const createRide = async (req, res) => {
   }
 };
 
-const acceptRide = async (req, res) => {
-  const captainId = req.user.id;
+export const acceptRide = async (req, res) => {
+  const riderId = req.user.id;
   const { rideId } = req.params;
 
   if (!rideId) {
@@ -81,18 +80,17 @@ const acceptRide = async (req, res) => {
       throw new NotFoundError("Ride not found");
     }
 
-    if (ride.status !== "SEARCHING_FOR_CAPTAIN") {
+    if (ride.status !== "SEARCHING_FOR_RIDER") {
       throw new BadRequestError("Ride is no longer available for assignment");
     }
 
-    ride.captain = captainId;
+    ride.rider = riderId;
     ride.status = "START";
     await ride.save();
 
-    ride = await ride.populate("captain");
+    ride = await ride.populate("rider");
 
     req.socket.to(`ride_${rideId}`).emit("rideUpdate", ride);
-
     req.socket.to(`ride_${rideId}`).emit("rideAccepted");
 
     res.status(StatusCodes.OK).json({
@@ -105,7 +103,7 @@ const acceptRide = async (req, res) => {
   }
 };
 
-const updateRideStatus = async (req, res) => {
+export const updateRideStatus = async (req, res) => {
   const { rideId } = req.params;
   const { status } = req.body;
 
@@ -114,7 +112,7 @@ const updateRideStatus = async (req, res) => {
   }
 
   try {
-    let ride = await Ride.findById(rideId).populate("customer captain");
+    let ride = await Ride.findById(rideId).populate("customer rider");
 
     if (!ride) {
       throw new NotFoundError("Ride not found");
@@ -139,13 +137,13 @@ const updateRideStatus = async (req, res) => {
   }
 };
 
-const getMyRides = async (req, res) => {
+export const getMyRides = async (req, res) => {
   const userId = req.user.id;
   const { status } = req.query;
 
   try {
     const query = {
-      $or: [{ customer: userId }, { captain: userId }],
+      $or: [{ customer: userId }, { rider: userId }],
     };
 
     if (status) {
@@ -154,7 +152,7 @@ const getMyRides = async (req, res) => {
 
     const rides = await Ride.find(query)
       .populate("customer", "name phone")
-      .populate("captain", "name phone")
+      .populate("rider", "name phone")
       .sort({ createdAt: -1 });
 
     res.status(StatusCodes.OK).json({
@@ -167,5 +165,3 @@ const getMyRides = async (req, res) => {
     throw new BadRequestError("Failed to retrieve rides");
   }
 };
-
-module.exports = { createRide, acceptRide, updateRideStatus, getMyRides };

@@ -1,6 +1,6 @@
-//models/Ride.js
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
+
+const { Schema } = mongoose;
 
 const rideSchema = new Schema(
   {
@@ -32,15 +32,15 @@ const rideSchema = new Schema(
       ref: "User",
       required: true,
     },
-    captain: {
+    rider: {
       type: Schema.Types.ObjectId,
       ref: "User",
       default: null,
     },
     status: {
       type: String,
-      enum: ["SEARCHING_FOR_CAPTAIN", "START", "ARRIVED", "COMPLETED"],
-      default: "SEARCHING_FOR_CAPTAIN",
+      enum: ["SEARCHING_FOR_RIDER", "START", "ARRIVED", "COMPLETED"],
+      default: "SEARCHING_FOR_RIDER",
     },
     otp: {
       type: String,
@@ -53,4 +53,4 @@ const rideSchema = new Schema(
 );
 
 const Ride = mongoose.model("Ride", rideSchema);
-module.exports = Ride;
+export default Ride;
