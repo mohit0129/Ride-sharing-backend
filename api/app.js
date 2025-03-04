@@ -5,22 +5,22 @@ import EventEmitter from 'events';
 import express from 'express';
 import http from 'http';
 import { Server as socketIo } from 'socket.io'; 
-import connectDB from './config/connect.js';
-import notFoundMiddleware from './middleware/not-found.js';
-import errorHandlerMiddleware from './middleware/error-handler.js';
-import authMiddleware from './middleware/authentication.js';
+import connectDB from '../config/connect.js';
+import notFoundMiddleware from '../middleware/not-found.js';
+import errorHandlerMiddleware from '../middleware/error-handler.js';
+import authMiddleware from '../middleware/authentication.js';
 //-newly added
-import adminRouter from "../routes/admin";
-import complaintRouter from "../routes/complaint";
-import promoCodeRouter from "../routes/promoCode";
-import paymentRouter from "../routes/payment";
+import adminRouter from "../routes/admin.js";
+import complaintRouter from "../routes/complaint.js";
+import promoCodeRouter from "../routes/promoCode.js";
+import paymentRouter from "../routes/payment.js";
 
 // Routers
-import authRouter from './routes/auth.js';
-import rideRouter from './routes/ride.js';
+import authRouter from '../routes/auth.js';
+import rideRouter from '../routes/ride.js';
 
 // Import socket handler
-import handleSocketConnection from './controllers/sockets.js';
+import handleSocketConnection from '../controllers/sockets.js';
 
 dotenv.config();
 
@@ -28,7 +28,7 @@ EventEmitter.defaultMaxListeners = 20;
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+// app.use(cors());
 
 const server = http.createServer(app);
 

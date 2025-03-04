@@ -1,5 +1,5 @@
 //models/Complaint.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const complaintSchema = new Schema({
@@ -41,4 +41,4 @@ complaintSchema.pre("save", async function(next) {
 });
 
 const Complaint = mongoose.model("Complaint", complaintSchema);
-module.exports = Complaint;
+export default Complaint;

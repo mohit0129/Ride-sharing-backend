@@ -1,5 +1,5 @@
 //models/PromoCode.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const promoCodeSchema = new Schema({
@@ -51,4 +51,4 @@ promoCodeSchema.pre("save", function(next) {
 });
 
 const PromoCode = mongoose.model("PromoCode", promoCodeSchema);
-module.exports = PromoCode;
+export default PromoCode;

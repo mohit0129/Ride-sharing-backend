@@ -1,5 +1,5 @@
 //models/Payment.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const paymentSchema = new Schema({
@@ -13,7 +13,7 @@ const paymentSchema = new Schema({
     ref: "User",
     required: true
   },
-  captainId: {
+  riderId: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true
@@ -51,4 +51,4 @@ paymentSchema.pre("save", async function(next) {
 });
 
 const Payment = mongoose.model("Payment", paymentSchema);
-module.exports = Payment;
+export default Payment;

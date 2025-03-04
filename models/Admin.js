@@ -1,7 +1,7 @@
 //models/Admin.js-new
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 const adminSchema = new mongoose.Schema({
   email: {
@@ -38,4 +38,4 @@ adminSchema.methods.comparePassword = async function(candidatePassword) {
 };
 
 const Admin = mongoose.model("Admin", adminSchema);
-module.exports = Admin;
+export default Admin;
