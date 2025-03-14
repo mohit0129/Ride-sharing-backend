@@ -26,7 +26,7 @@ import {
   getPaymentDetails,
   getUserPayments
 } from "../controllers/payment.js";
-import adminAuth from "../middleware/adminAuth.js";
+import adminAuth from "../middleware/admin-auth.js";
 import auth from "../middleware/authentication.js";
 
 const router = express.Router();

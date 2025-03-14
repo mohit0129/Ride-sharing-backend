@@ -1,25 +1,23 @@
-// //routes/admin.js-new
-// import express from "express";
-// const router = express.Router();
-// import { login } from "../controllers/admin.js";
-// import adminAuth from "../middleware/adminAuth.js";
-
-// router.post("/login", login);
-
-// // module.exports = router;
-// export default admin;
-
-// routes/admin.js
-import express from "express";
-import { login } from "../controllers/admin.js";
-import adminAuth from "../middleware/adminAuth.js";
+import express from 'express';
+import { register, login, refreshToken } from '../controllers/admin.js';
+import adminAuth from '../middleware/admin-auth.js';
+import { hasPermission } from '../middleware/admin-auth.js';
 
 const router = express.Router();
 
-// Route to login admin
-router.post("/login", login);
+// Auth routes
+router.post('/register', register);
+router.post('/login', login);
+router.post('/refresh-token', refreshToken);
 
-// Protected routes for admins (you can add more routes here in the future)
-router.use(adminAuth);
+// Example of protected admin routes
+router.get('/dashboard', adminAuth, (req, res) => {
+  res.status(200).json({ message: 'Admin dashboard access granted' });
+});
+
+// Example of permission-based route
+router.post('/settings', adminAuth, hasPermission('manage'), (req, res) => {
+  res.status(200).json({ message: 'Admin settings access granted' });
+});
 
 export default router;

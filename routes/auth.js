@@ -1,3 +1,4 @@
+//routes/auth.js
 import express from 'express';
 import { refreshToken, auth } from '../controllers/auth.js';
 

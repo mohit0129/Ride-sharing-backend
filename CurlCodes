@@ -1,0 +1,173 @@
+# Create/Sign in Customer
+curl -X POST https://ride-sharing-wnhj.onrender.com/auth/signin \
+-H "Content-Type: application/json" \
+-d '{
+  "phone": "1234567890",
+  "role": "customer"
+}'
+
+# Create/Sign in Captain
+curl -X POST https://ride-sharing-wnhj.onrender.com/auth/signin \
+-H "Content-Type: application/json" \
+-d '{
+  "phone": "9876543210",
+  "role": "captain"
+}'
+
+# Create a new ride
+curl -X POST https://ride-sharing-wnhj.onrender.com/ride/create \
+-H "Authorization: Bearer YOUR_CUSTOMER_TOKEN" \
+-H "Content-Type: application/json" \
+-d '{
+  "vehicle": "bike",
+  "pickup": {
+    "address": "MG Road",
+    "latitude": 12.9716,
+    "longitude": 77.5946
+  },
+  "drop": {
+    "address": "Indiranagar",
+    "latitude": 12.9784,
+    "longitude": 77.6408
+  }
+}'
+
+# Accept ride
+curl -X PATCH https://ride-sharing-wnhj.onrender.com/ride/accept/RIDE_ID \
+-H "Authorization: Bearer YOUR_CAPTAIN_TOKEN" \
+-H "Content-Type: application/json"
+
+# Update to START
+curl -X PATCH https://ride-sharing-wnhj.onrender.com/ride/update/RIDE_ID \
+-H "Authorization: Bearer YOUR_CAPTAIN_TOKEN" \
+-H "Content-Type: application/json" \
+-d '{"status": "START"}'
+
+# Update to ARRIVED
+curl -X PATCH https://ride-sharing-wnhj.onrender.com/ride/update/RIDE_ID \
+-H "Authorization: Bearer YOUR_CAPTAIN_TOKEN" \
+-H "Content-Type: application/json" \
+-d '{"status": "ARRIVED"}'
+
+# Update to COMPLETED
+curl -X PATCH https://ride-sharing-wnhj.onrender.com/ride/update/RIDE_ID \
+-H "Authorization: Bearer YOUR_CAPTAIN_TOKEN" \
+-H "Content-Type: application/json" \
+-d '{"status": "COMPLETED"}'
+
+# Get all rides
+curl -X GET https://ride-sharing-wnhj.onrender.com/ride/rides \
+-H "Authorization: Bearer YOUR_TOKEN"
+
+# Get rides with specific status
+curl -X GET "https://ride-sharing-wnhj.onrender.com/ride/rides?status=COMPLETED" \
+-H "Authorization: Bearer YOUR_TOKEN"
+
+curl -X POST https://ride-sharing-wnhj.onrender.com/auth/refresh-token \
+-H "Content-Type: application/json" \
+-d '{
+  "refresh_token": "YOUR_REFRESH_TOKEN"
+}'
+
+
+
+# ==================== Admin Endpoints ==================== 
+
+# Register an Admin:
+curl -X POST https://ride-sharing-wnhj.onrender.com/admin/register \
+  -H "Content-Type: application/json" \
+  -d '{
+  "username": "Mohit",
+  "password": "0102",
+  "email": "mohit10209@gmail.com"
+ }'
+
+# Admin Login:
+curl -X POST https://ride-sharing-wnhj.onrender.com/admin/login \
+  -H "Content-Type: application/json" \
+  -d '{
+  "username": "mohit10209@gmail.com",
+  "password": "010"
+ }'
+
+# Refresh Admin Token:
+curl -X POST https://ride-sharing-wnhj.onrender.com/admin/refresh-token \
+  -H "Content-Type: application/json" \
+  -d '{
+  "refresh_token": "your_refresh_token"
+ }'
+
+# ==================== Complaint Endpoints ====================
+
+# Create a new complaint (requires user authentication)
+curl -X POST https://ride-sharing-wnhj.onrender.com/complaint \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer USER_ACCESS_TOKEN" \
+  -d '{
+    "issueType": "payment",
+    "description": "Payment was deducted but ride was not completed"
+  }'
+
+# Update complaint status (requires admin authentication)
+curl -X PATCH https://ride-sharing-wnhj.onrender.com/complaint/COMPLAINT_ID \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{
+    "status": "in_progress"
+  }'
+
+# Get all complaints (admin only)
+curl -X GET https://ride-sharing-wnhj.onrender.com/complaint \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+
+# Get user's complaints
+curl -X GET https://ride-sharing-wnhj.onrender.com/complaint/user \
+  -H "Authorization: Bearer USER_ACCESS_TOKEN"
+
+# ==================== Promo Code Endpoints ====================
+
+# Create new promo code (admin only)
+curl -X POST https://ride-sharing-wnhj.onrender.com/promo \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{
+    "promoCode": "SUMMER2025",
+    "discount": 20,
+    "expiryDate": "2025-08-31T23:59:59.999Z"
+  }'
+
+# Get all promo codes (admin only)
+curl -X GET https://ride-sharing-wnhj.onrender.com/promo \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+
+# Validate a promo code (requires user authentication)
+curl -X GET https://ride-sharing-wnhj.onrender.com/promo/validate/SUMMER2025 \
+  -H "Authorization: Bearer USER_ACCESS_TOKEN"
+
+# ==================== Payment Endpoints ====================
+
+# Create new payment
+curl -X POST https://ride-sharing-wnhj.onrender.com/payment \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer USER_ACCESS_TOKEN" \
+  -d '{
+    "rideId": "RIDE_ID",
+    "amount": 150.50,
+    "paymentMethod": "card"
+  }'
+
+# Update payment status (admin only)
+curl -X PATCH https://ride-sharing-wnhj.onrender.com/payment/PAYMENT_ID \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{
+    "status": "completed"
+  }'
+
+# Get specific payment details
+curl -X GET https://ride-sharing-wnhj.onrender.com/payment/PAYMENT_ID \
+  -H "Authorization: Bearer USER_ACCESS_TOKEN"
+
+# Get user's payment history
+curl -X GET https://ride-sharing-wnhj.onrender.com/payment/user/history \
+  -H "Authorization: Bearer USER_ACCESS_TOKEN"

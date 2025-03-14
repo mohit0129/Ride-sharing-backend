@@ -1,3 +1,4 @@
+//middkeware/authentication.js
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import NotFoundError from "../errors/not-found.js";
