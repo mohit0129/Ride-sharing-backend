@@ -5,7 +5,6 @@ const Schema = mongoose.Schema;
 const paymentSchema = new Schema({
   paymentId: {
     type: String,
-    required: true,
     unique: true
   },
   customerId: {

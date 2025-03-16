@@ -68,19 +68,52 @@
 import Payment from "../models/Payment.js";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, NotFoundError } from "../errors/index.js";
+import mongoose from "mongoose";
+
+// export const createPayment = async (req, res) => {
+//   const { rideId, amount, paymentMethod } = req.body;
+//   const customerId = req.user.id;
+
+//   if (!rideId || !amount || !paymentMethod) {
+//     throw new BadRequestError("Ride ID, amount, and payment method are required");
+//   }
+
+//   try {
+//     const payment = await Payment.create({
+//       customerId,
+//       rideId,
+//       amount,
+//       paymentMethod,
+//     });
+
+//     res.status(StatusCodes.CREATED).json({
+//       message: "Payment created successfully",
+//       payment,
+//     });
+//   } catch (error) {
+//     console.error("Error creating payment:", error);
+//     throw new BadRequestError("Failed to create payment");
+//   }
+// };
 
 export const createPayment = async (req, res) => {
-  const { rideId, amount, paymentMethod } = req.body;
+  const { rideId, amount, paymentMethod, riderId } = req.body;
   const customerId = req.user.id;
 
-  if (!rideId || !amount || !paymentMethod) {
-    throw new BadRequestError("Ride ID, amount, and payment method are required");
+  if (!rideId || !amount || !paymentMethod || !riderId) {
+    throw new BadRequestError("Ride ID, amount, payment method, and rider ID are required");
+  }
+
+  // Validate rideId and riderId as ObjectId
+  if (!mongoose.Types.ObjectId.isValid(rideId) || !mongoose.Types.ObjectId.isValid(riderId)) {
+    throw new BadRequestError("Invalid rideId or riderId format");
   }
 
   try {
     const payment = await Payment.create({
       customerId,
-      rideId,
+      rideId: new mongoose.Types.ObjectId(rideId),
+      riderId: new mongoose.Types.ObjectId(riderId),
       amount,
       paymentMethod,
     });

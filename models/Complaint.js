@@ -5,7 +5,6 @@ const Schema = mongoose.Schema;
 const complaintSchema = new Schema({
   ticketId: {
     type: String,
-    required: true,
     unique: true
   },
   userId: {

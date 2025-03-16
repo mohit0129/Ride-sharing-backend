@@ -5,7 +5,6 @@ const Schema = mongoose.Schema;
 const promoCodeSchema = new Schema({
   promoId: {
     type: String,
-    required: true,
     unique: true
   },
   promoCode: {

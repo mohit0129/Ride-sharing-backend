@@ -1,21 +1,21 @@
 # Create/Sign in Customer
-curl -X POST https://ride-sharing-wnhj.onrender.com/auth/signin \
+curl -X POST http://localhost:3000/auth/signin \
 -H "Content-Type: application/json" \
 -d '{
   "phone": "1234567890",
   "role": "customer"
 }'
 
-# Create/Sign in Captain
-curl -X POST https://ride-sharing-wnhj.onrender.com/auth/signin \
+# Create/Sign in rider
+curl -X POST http://localhost:3000/auth/signin \
 -H "Content-Type: application/json" \
 -d '{
   "phone": "9876543210",
-  "role": "captain"
+  "role": "rider"
 }'
 
 # Create a new ride
-curl -X POST https://ride-sharing-wnhj.onrender.com/ride/create \
+curl -X POST http://localhost:3000/ride/create \
 -H "Authorization: Bearer YOUR_CUSTOMER_TOKEN" \
 -H "Content-Type: application/json" \
 -d '{
@@ -33,37 +33,37 @@ curl -X POST https://ride-sharing-wnhj.onrender.com/ride/create \
 }'
 
 # Accept ride
-curl -X PATCH https://ride-sharing-wnhj.onrender.com/ride/accept/RIDE_ID \
--H "Authorization: Bearer YOUR_CAPTAIN_TOKEN" \
+curl -X PATCH http://localhost:3000/ride/accept/RIDE_ID \
+-H "Authorization: Bearer YOUR_rider_TOKEN" \
 -H "Content-Type: application/json"
 
 # Update to START
-curl -X PATCH https://ride-sharing-wnhj.onrender.com/ride/update/RIDE_ID \
--H "Authorization: Bearer YOUR_CAPTAIN_TOKEN" \
+curl -X PATCH http://localhost:3000/ride/update/RIDE_ID \
+-H "Authorization: Bearer YOUR_rider_TOKEN" \
 -H "Content-Type: application/json" \
 -d '{"status": "START"}'
 
 # Update to ARRIVED
-curl -X PATCH https://ride-sharing-wnhj.onrender.com/ride/update/RIDE_ID \
--H "Authorization: Bearer YOUR_CAPTAIN_TOKEN" \
+curl -X PATCH http://localhost:3000/ride/update/RIDE_ID \
+-H "Authorization: Bearer YOUR_rider_TOKEN" \
 -H "Content-Type: application/json" \
 -d '{"status": "ARRIVED"}'
 
 # Update to COMPLETED
-curl -X PATCH https://ride-sharing-wnhj.onrender.com/ride/update/RIDE_ID \
--H "Authorization: Bearer YOUR_CAPTAIN_TOKEN" \
+curl -X PATCH http://localhost:3000/ride/update/RIDE_ID \
+-H "Authorization: Bearer YOUR_rider_TOKEN" \
 -H "Content-Type: application/json" \
 -d '{"status": "COMPLETED"}'
 
 # Get all rides
-curl -X GET https://ride-sharing-wnhj.onrender.com/ride/rides \
+curl -X GET http://localhost:3000/ride/rides \
 -H "Authorization: Bearer YOUR_TOKEN"
 
 # Get rides with specific status
-curl -X GET "https://ride-sharing-wnhj.onrender.com/ride/rides?status=COMPLETED" \
+curl -X GET "http://localhost:3000/ride/rides?status=COMPLETED" \
 -H "Authorization: Bearer YOUR_TOKEN"
 
-curl -X POST https://ride-sharing-wnhj.onrender.com/auth/refresh-token \
+curl -X POST http://localhost:3000/auth/refresh-token \
 -H "Content-Type: application/json" \
 -d '{
   "refresh_token": "YOUR_REFRESH_TOKEN"
@@ -74,7 +74,7 @@ curl -X POST https://ride-sharing-wnhj.onrender.com/auth/refresh-token \
 # ==================== Admin Endpoints ==================== 
 
 # Register an Admin:
-curl -X POST https://ride-sharing-wnhj.onrender.com/admin/register \
+curl -X POST http://localhost:3000/admin/register \
   -H "Content-Type: application/json" \
   -d '{
   "username": "Mohit",
@@ -83,15 +83,15 @@ curl -X POST https://ride-sharing-wnhj.onrender.com/admin/register \
  }'
 
 # Admin Login:
-curl -X POST https://ride-sharing-wnhj.onrender.com/admin/login \
+curl -X POST http://localhost:3000/admin/login \
   -H "Content-Type: application/json" \
   -d '{
   "username": "mohit10209@gmail.com",
-  "password": "010"
+  "password": "0102"
  }'
 
 # Refresh Admin Token:
-curl -X POST https://ride-sharing-wnhj.onrender.com/admin/refresh-token \
+curl -X POST http://localhost:3000/admin/refresh-token \
   -H "Content-Type: application/json" \
   -d '{
   "refresh_token": "your_refresh_token"
@@ -100,7 +100,7 @@ curl -X POST https://ride-sharing-wnhj.onrender.com/admin/refresh-token \
 # ==================== Complaint Endpoints ====================
 
 # Create a new complaint (requires user authentication)
-curl -X POST https://ride-sharing-wnhj.onrender.com/complaint \
+curl -X POST http://localhost:3000/complaint \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer USER_ACCESS_TOKEN" \
   -d '{
@@ -109,7 +109,7 @@ curl -X POST https://ride-sharing-wnhj.onrender.com/complaint \
   }'
 
 # Update complaint status (requires admin authentication)
-curl -X PATCH https://ride-sharing-wnhj.onrender.com/complaint/COMPLAINT_ID \
+curl -X PATCH http://localhost:3000/complaint/COMPLAINT_ID \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ADMIN_TOKEN" \
   -d '{
@@ -117,17 +117,17 @@ curl -X PATCH https://ride-sharing-wnhj.onrender.com/complaint/COMPLAINT_ID \
   }'
 
 # Get all complaints (admin only)
-curl -X GET https://ride-sharing-wnhj.onrender.com/complaint \
+curl -X GET http://localhost:3000/complaint \
   -H "Authorization: Bearer ADMIN_TOKEN"
 
 # Get user's complaints
-curl -X GET https://ride-sharing-wnhj.onrender.com/complaint/user \
+curl -X GET http://localhost:3000/complaint/user \
   -H "Authorization: Bearer USER_ACCESS_TOKEN"
 
 # ==================== Promo Code Endpoints ====================
 
 # Create new promo code (admin only)
-curl -X POST https://ride-sharing-wnhj.onrender.com/promo \
+curl -X POST http://localhost:3000/promo \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ADMIN_TOKEN" \
   -d '{
@@ -137,17 +137,17 @@ curl -X POST https://ride-sharing-wnhj.onrender.com/promo \
   }'
 
 # Get all promo codes (admin only)
-curl -X GET https://ride-sharing-wnhj.onrender.com/promo \
+curl -X GET http://localhost:3000/promo \
   -H "Authorization: Bearer ADMIN_TOKEN"
 
 # Validate a promo code (requires user authentication)
-curl -X GET https://ride-sharing-wnhj.onrender.com/promo/validate/SUMMER2025 \
+curl -X GET http://localhost:3000/promo/validate/SUMMER2025 \
   -H "Authorization: Bearer USER_ACCESS_TOKEN"
 
 # ==================== Payment Endpoints ====================
 
 # Create new payment
-curl -X POST https://ride-sharing-wnhj.onrender.com/payment \
+curl -X POST http://localhost:3000/payment \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer USER_ACCESS_TOKEN" \
   -d '{
@@ -157,7 +157,7 @@ curl -X POST https://ride-sharing-wnhj.onrender.com/payment \
   }'
 
 # Update payment status (admin only)
-curl -X PATCH https://ride-sharing-wnhj.onrender.com/payment/PAYMENT_ID \
+curl -X PATCH http://localhost:3000/payment/PAYMENT_ID \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ADMIN_TOKEN" \
   -d '{
@@ -165,9 +165,9 @@ curl -X PATCH https://ride-sharing-wnhj.onrender.com/payment/PAYMENT_ID \
   }'
 
 # Get specific payment details
-curl -X GET https://ride-sharing-wnhj.onrender.com/payment/PAYMENT_ID \
+curl -X GET http://localhost:3000/payment/PAYMENT_ID \
   -H "Authorization: Bearer USER_ACCESS_TOKEN"
 
 # Get user's payment history
-curl -X GET https://ride-sharing-wnhj.onrender.com/payment/user/history \
+curl -X GET http://localhost:3000/payment/user/history \
   -H "Authorization: Bearer USER_ACCESS_TOKEN"
