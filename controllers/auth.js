@@ -105,7 +105,7 @@ export const signup = async (req, res) => {
   } = req.body;
 
   // Validate required fields for all users
-  if (!firstName || !lastName || !email || !phone || !birthDate || !role) {
+  if (!firstName || !lastName || !phone || !birthDate || !role) {
     throw new BadRequestError("Please provide all required fields");
   }
 
@@ -115,9 +115,9 @@ export const signup = async (req, res) => {
   }
 
   // Check if user with the same phone or email already exists
-  const existingUser = await User.findOne({ $or: [{ phone }, { email }] });
+  const existingUser = await User.findOne({ $or: [{ phone }] });
   if (existingUser) {
-    throw new BadRequestError("User with this phone number or email already exists");
+    throw new BadRequestError("User with this phone number already exists");
   }
 
   // Additional validation for riders
@@ -188,8 +188,8 @@ export const signin = async (req, res) => {
   const { email, phone } = req.body;
 
   // User must provide either email or phone
-  if (!email && !phone) {
-    throw new BadRequestError("Please provide either email or phone number");
+  if (!phone) {
+    throw new BadRequestError("Please provide phone number");
   }
 
   try {
