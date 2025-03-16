@@ -4,7 +4,6 @@ import 'express-async-errors';
 import EventEmitter from 'events';
 import express from 'express';
 import http from 'http';
-import cors from 'cors';
 import { Server as socketIo } from 'socket.io'; 
 import connectDB from '../config/connect.js';
 import notFoundMiddleware from '../middleware/not-found.js';
@@ -28,14 +27,8 @@ dotenv.config();
 EventEmitter.defaultMaxListeners = 20;
 
 const app = express();
-
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
 app.use(express.json());
+// app.use(cors());
 
 const server = http.createServer(app);
 

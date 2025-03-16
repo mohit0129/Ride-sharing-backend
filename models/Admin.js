@@ -1,3 +1,4 @@
+//models/Admin.js
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 

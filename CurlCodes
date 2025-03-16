@@ -1,8 +1,8 @@
-# Create/Sign in Customer
+<!-- # Create/Sign in Customer
 curl -X POST http://localhost:3000/auth/signin \
 -H "Content-Type: application/json" \
 -d '{
-  "phone": "1234567890",
+  "phone": "2932938928",
   "role": "customer"
 }'
 
@@ -10,9 +10,68 @@ curl -X POST http://localhost:3000/auth/signin \
 curl -X POST http://localhost:3000/auth/signin \
 -H "Content-Type: application/json" \
 -d '{
-  "phone": "9876543210",
+  "phone": "8989373281",
   "role": "rider"
-}'
+}' -->
+
+# 1. Customer Signup
+curl -X POST http://localhost:3000/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john9@example.com",
+    "phone": "6574839201",
+    "birthDate": "1990-01-15",
+    "role": "customer"
+  }'
+
+# 2. Rider Signup
+curl -X POST http://localhost:3000/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "email": "jane10@example.com",
+    "phone": "6574839200",
+    "birthDate": "1988-07-23",
+    "role": "rider",
+    "vehicleType": "car",
+    "manufacturer": "Toyota",
+    "model": "Camry",
+    "modelYear": 2019,
+    "licensePlate": "ABC123",
+    "color": "blue"
+  }'
+
+# 3. Signin with Phone
+curl -X POST http://localhost:3000/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "phone": "1234567890"
+  }'
+
+# 4. Signin with Email
+curl -X POST http://localhost:3000/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "jane@example.com"
+  }'
+
+# 5. Refresh Token
+curl -X POST http://localhost:3000/auth/refresh-token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refresh_token": "YOUR_REFRESH_TOKEN_HERE"
+  }'
+
+# 6. Deactivate Account (Change status to "deleted")
+curl -X POST http://localhost:3000/auth/deactivate \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+# 7. Accessing Protected Ride Route (Example)
+curl -X GET http://localhost:3000/ride \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
 
 # Create a new ride
 curl -X POST http://localhost:3000/ride/create \
