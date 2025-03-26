@@ -82,7 +82,7 @@ export const createComplaint = async (req, res) => {
 
 export const updateComplaint = async (req, res) => {
   const { id: complaintId } = req.params;
-  const { status } = req.body;
+  const { status, adminRemarks } = req.body;
 
   if (!status) {
     throw new BadRequestError("Status is required to update complaint");
@@ -91,7 +91,7 @@ export const updateComplaint = async (req, res) => {
   try {
     const complaint = await Complaint.findOneAndUpdate(
       { _id: complaintId },
-      { status },
+      { status, adminRemarks }, // Changed from just { status }
       { new: true, runValidators: true }
     );
 
@@ -140,3 +140,84 @@ export const getUserComplaints = async (req, res) => {
     throw new BadRequestError("Failed to retrieve user complaints");
   }
 };
+
+export const getComplaintById = async (req, res) => {
+  const { id: complaintId } = req.params;
+
+  try {
+    const complaint = await Complaint.findById(complaintId).populate("userId", "phone");
+
+    if (!complaint) {
+      throw new NotFoundError(`No complaint found with ID ${complaintId}`);
+    }
+
+    res.status(StatusCodes.OK).json({
+      message: "Complaint retrieved successfully",
+      complaint,
+    });
+  } catch (error) {
+    console.error("Error retrieving complaint:", error);
+    throw new BadRequestError("Failed to retrieve complaint");
+  }
+};
+
+// export const updateComplaintWithRemarks = async (req, res) => {
+//   const { id: complaintId } = req.params;
+//   const { status, adminRemarks } = req.body;
+
+//   console.log("Received update request for:", complaintId);
+//   console.log("Request Body:", req.body); // ✅ Debug log
+
+//   if (!status && !adminRemarks) {
+//     throw new BadRequestError("At least one field (status or adminRemarks) is required");
+//   }
+
+//   try {
+//     const updateFields = {};
+//     if (status) updateFields.status = status;
+//     if (adminRemarks) updateFields.adminRemarks = adminRemarks;
+
+//     const complaint = await Complaint.findOneAndUpdate(
+//       { _id: complaintId },
+//       { status, adminRemarks }, // Changed from just { status }
+//       { new: true, runValidators: true }
+//     );
+
+//     if (!complaint) {
+//       throw new NotFoundError(`No complaint found with ID ${complaintId}`);
+//     }
+
+//     console.log("Updated Complaint:", complaint); // ✅ Debug log after update
+
+//     res.status(StatusCodes.OK).json({
+//       message: "Complaint updated successfully",
+//       complaint,
+//     });
+//   } catch (error) {
+//     console.error("Error updating complaint:", error);
+//     throw new BadRequestError("Failed to update complaint");
+//   }
+// };
+
+
+
+export const deleteComplaint = async (req, res) => {
+  const { id: complaintId } = req.params;
+
+  try {
+    const complaint = await Complaint.findByIdAndDelete(complaintId);
+
+    if (!complaint) {
+      throw new NotFoundError(`No complaint found with ID ${complaintId}`);
+    }
+
+    res.status(StatusCodes.OK).json({
+      message: "Complaint deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting complaint:", error);
+    throw new BadRequestError("Failed to delete complaint");
+  }
+};
+
+

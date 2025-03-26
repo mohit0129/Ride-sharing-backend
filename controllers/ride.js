@@ -1,3 +1,4 @@
+//controllers/ride.js
 import Ride from "../models/Ride.js";
 import { BadRequestError, NotFoundError } from "../errors/index.js";
 import { StatusCodes } from "http-status-codes";
@@ -163,5 +164,71 @@ export const getMyRides = async (req, res) => {
   } catch (error) {
     console.error("Error retrieving rides:", error);
     throw new BadRequestError("Failed to retrieve rides");
+  }
+};
+
+// Get All Rides
+export const getAllRides = async (req, res) => {
+  try {
+    const rides = await Ride.find().populate("customer rider").sort({ createdAt: -1 });
+    res.status(StatusCodes.OK).json({ message: "All rides retrieved", count: rides.length, rides });
+  } catch (error) {
+    console.error("Error retrieving all rides:", error);
+    throw new BadRequestError("Failed to retrieve all rides");
+  }
+};
+
+// Get Ride by ID
+export const getRideById = async (req, res) => {
+  const { rideId } = req.params;
+
+  try {
+    const ride = await Ride.findById(rideId).populate("customer rider");
+    if (!ride) throw new NotFoundError(`No ride found with ID ${rideId}`);
+
+    res.status(StatusCodes.OK).json({ message: "Ride retrieved successfully", ride });
+  } catch (error) {
+    console.error("Error retrieving ride:", error);
+    throw new BadRequestError("Failed to retrieve ride");
+  }
+};
+
+// Delete a Ride
+export const deleteRide = async (req, res) => {
+  const { rideId } = req.params;
+
+  try {
+    const ride = await Ride.findByIdAndDelete(rideId);
+    if (!ride) throw new NotFoundError(`No ride found with ID ${rideId}`);
+
+    res.status(StatusCodes.OK).json({ message: "Ride deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting ride:", error);
+    throw new BadRequestError("Failed to delete ride");
+  }
+};
+
+export const rideStatusUpdate = async (req, res) => {
+  const { rideId } = req.params;
+  const { status } = req.body;
+
+  try {
+    let ride = await Ride.findById(rideId).populate("customer rider");
+    if (!ride) throw new NotFoundError("Ride not found");
+
+    if (!["SEARCHING_FOR_RIDER", "START", "ARRIVED", "COMPLETED"].includes(status)) {
+      throw new BadRequestError("Invalid ride status");
+    }
+
+    ride.status = status;
+    await ride.save();
+
+    res.status(StatusCodes.OK).json({
+      message: `Admin updated ride status to ${status}`,
+      ride,
+    });
+  } catch (error) {
+    console.error("Error updating ride status:", error);
+    throw new BadRequestError("Failed to update ride status");
   }
 };

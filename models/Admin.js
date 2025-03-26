@@ -27,6 +27,9 @@ const adminSchema = new Schema(
     permissions: {
       type: [String],
       default: ['view'],
+    },
+    roles:{
+      default: ["admin"]
     }
   },
   {

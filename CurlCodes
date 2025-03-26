@@ -214,3 +214,228 @@ curl -X GET https://ride-sharing-wnhj.onrender.com/payment/PAYMENT_ID \
 # Get user's payment history
 curl -X GET https://ride-sharing-wnhj.onrender.com/payment/user/history \
   -H "Authorization: Bearer USER_ACCESS_TOKEN"
+
+
+# ##########################################################################################################################################################################################
+view, update(status, full), delete, create
+
+#### 1. Promo Code
+  # Create a new promo code (Admin only)
+curl -X POST http://localhost:3000/promo \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik" \
+  -d '{
+    "promoCode": "SUMMER2025",
+    "discount": 20,
+    "expiryDate": "2025-08-31T23:59:59.999Z"
+  }'
+
+# Get all promo codes (Admin only)
+curl -X GET http://localhost:3000/promo \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik"
+
+# Update a promo code (Admin only)
+curl -X PATCH http://localhost:3000/promo/60d21b4667d0d8992e610c85 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik" \
+  -d '{
+    "discount": 25,
+    "expiryDate": "2025-09-30T23:59:59.999Z"
+  }'
+
+# Delete a promo code (Admin only)
+curl -X DELETE http://localhost:3000/promo/60d21b4667d0d8992e610c85 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik"
+
+# Update promo code status (Admin only)
+curl -X PATCH http://localhost:3000/promo/status/60d21b4667d0d8992e610c85 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik" \
+  -d '{
+    "status": "expired"
+  }'
+
+#### 2. Payments
+  # Get all payments (Admin only)
+curl -X GET http://localhost:3000/payment/admin/all \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik"
+
+# Update payment status (Admin only)
+curl -X PATCH http://localhost:3000/payment/status/60d21b4667d0d8992e610c87 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik" \
+  -d '{
+    "status": "completed"
+  }'
+
+# Update payment details (Admin only)
+curl -X PATCH http://localhost:3000/payment/60d21b4667d0d8992e610c87 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik" \
+  -d '{
+    "amount": 175.25,
+    "paymentMethod": "wallet",
+    "status": "completed"
+  }'
+
+# Delete a payment (Admin only)
+curl -X DELETE http://localhost:3000/payment/60d21b4667d0d8992e610c87 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik"
+
+#### 3. Complaints
+<!-- # Update complaint status (requires admin authentication)
+curl -X PATCH http://localhost:3000/complaint/COMPLAINT_ID \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik" \
+  -d '{
+    "status": "in_progress"
+  }'-->
+
+# Get all complaints (admin only)
+curl -X GET http://localhost:3000/complaint \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik"
+
+# Get user's complaints
+curl -X GET http://localhost:3000/complaint/user \
+  -H "Authorization: Bearer USER_ACCESS_TOKEN" 
+
+# Update a complaint status with admin remarks (Admin only)
+curl -X PATCH http://localhost:3000/complaint/60d21b4667d0d8992e610c85 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik" \
+  -d '{
+    "status": "in_progress",
+    "adminRemarks": "Contacted the driver for more information"
+  }'
+
+<!-- # Get complaint by ID (complaint owner)  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+curl -X GET http://localhost:3000/complaint/67ded8d37d3c4c9d61469a9d \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI0OTE1NTYsImV4cCI6MTc0MjgzNzE1Nn0.Rq-_eQvx5jxNUBBdr-m7bPTVx3KqaX99A9a3wsrXH7Q" -->
+
+# Delete a complaint (Admin)
+curl -X DELETE http://localhost:3000/complaint/67ded8d37d3c4c9d61469a9d \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI0OTE1NTYsImV4cCI6MTc0MjgzNzE1Nn0.Rq-_eQvx5jxNUBBdr-m7bPTVx3KqaX99A9a3wsrXH7Q"
+
+#### 4. rides
+<!-- # Get all rides
+curl -X GET http://localhost:3000/ride/rides \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik"
+
+# Get rides with specific status
+curl -X GET "http://localhost:3000/ride/rides?status=COMPLETED" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik"
+
+curl -X POST http://localhost:3000/auth/refresh-token \
+-H "Content-Type: application/json" \
+-d '{
+  "refresh_token": "YOUR_REFRESH_TOKEN"
+}' -->
+# Admin: Get all rides  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+curl -X GET http://localhost:3000/ride/admin/all \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik"
+
+# Admin: Get all rides with filters  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+curl -X GET "http://localhost:3000/ride/admin/all?status=COMPLETED&vehicle=cabEconomy&startDate=2025-01-01&endDate=2025-03-19" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik"
+
+# Admin: Create a ride for a customer
+curl -X POST http://localhost:3000/ride/admin/create \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik" \
+  -d '{
+    "vehicle": "cabPremium",
+    "pickup": {
+      "address": "123 Main St, City",
+      "latitude": 12.9716,
+      "longitude": 77.5946
+    },
+    "drop": {
+      "address": "456 Park Ave, City",
+      "latitude": 12.9815,
+      "longitude": 77.6073
+    },
+    "customerId": "60d21b4667d0d8992e610c90"
+  }'
+
+# Admin: Update a ride (comprehensive) XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+curl -X PATCH http://localhost:3000/ride/admin/update/60d21b4667d0d8992e610c85 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik" \
+  -d '{
+    "vehicle": "cabPremium",
+    "fare": 350,
+    "status": "COMPLETED",
+    "riderId": "60d21b4667d0d8992e610c88",
+    "pickup": {
+      "address": "Updated Pickup Address",
+      "latitude": 12.9716,
+      "longitude": 77.5946
+    },
+    "drop": {
+      "address": "Updated Drop Address",
+      "latitude": 12.9815,
+      "longitude": 77.6073
+    }
+  }'
+
+# Admin: Delete a ride  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+curl -X DELETE http://localhost:3000/ride/admin/60d21b4667d0d8992e610c85 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik"
+
+#### 5. Users
+# Get all users (admin only) XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+curl -X GET \
+  http://localhost:3000/auth/users \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik'
+
+curl -X GET http://localhost:3000/auth/users \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+
+# Get current user profile XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+curl -X GET \
+  http://localhost:3000/auth/user \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik'
+
+# Update user profile (basic fields) XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+curl -X PATCH \
+  http://localhost:3000/auth/user \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "firstName": "Updated",
+    "lastName": "Name",
+    "email": "updated@example.com"
+  }'
+
+# Update user profile (for riders, including vehicle details) XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+curl -X PATCH \
+  http://localhost:3000/auth/user \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "firstName": "Updated",
+    "lastName": "Name",
+    "email": "updated@example.com",
+    "vehicleDetails": {
+      "vehicleType": "car",
+      "manufacturer": "Toyota",
+      "model": "Corolla",
+      "modelYear": 2022,
+      "licensePlate": "ABC123",
+      "color": "Blue"
+    }
+  }'
+
+# Deactivate account XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+curl -X POST \
+  http://localhost:3000/auth/deactivate \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDQ2YWIyOWYyMzcwMDJiODU0NzBlYSIsInVzZXJuYW1lIjoiTW9oaXQiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NDI2NjAxNzAsImV4cCI6MTc0MzAwNTc3MH0.ehYxoTLu1ROVwHM-qqnZZdYkKz3s02EY30C29lL8Dik'
+
+
+  # Users - get all users, get single user by id, update user, update the user by status (activate, deactivate), delete the user, create user(admin, customer, riders)
+  Rides - get all rides, update ride status, delete rides, get ride by id
+  # Complaints - get all Complaints, update Complaints status with admin remarks, delete Complaints, get Complaint by id
+  <!-- Payments - get all Payments, update Payments status, delete Payments, get Payment by id -->
+  <!-- promo codes - create promo codes, get all promo codes, update promo codes status, delete promo codes, get promo code by id -->
+

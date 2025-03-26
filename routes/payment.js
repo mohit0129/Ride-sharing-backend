@@ -24,9 +24,11 @@ import {
   createPayment,
   updatePaymentStatus,
   getPaymentDetails,
-  getUserPayments
+  getUserPayments,
+  getAllPayments,
+  deletePayment
 } from "../controllers/payment.js";
-import adminAuth from "../middleware/admin-auth.js";
+import { adminAuth } from "../middleware/authentication.js";
 import auth from "../middleware/authentication.js";
 
 const router = express.Router();
@@ -34,8 +36,14 @@ const router = express.Router();
 // Public route: Create a payment (requires user authentication)
 router.post("/", auth, createPayment);
 
+// Admin-only route: Get all payments
+router.get("/", adminAuth, getAllPayments);
+
 // Admin-only route: Update payment status
 router.patch("/:id", adminAuth, updatePaymentStatus);
+
+// Admin-only route: Delete a payment
+router.delete("/:id", adminAuth, deletePayment);
 
 // Public route: Get payment details (requires user authentication)
 router.get("/:id", auth, getPaymentDetails);

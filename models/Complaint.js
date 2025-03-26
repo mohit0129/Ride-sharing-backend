@@ -25,6 +25,10 @@ const complaintSchema = new Schema({
     type: String,
     enum: ["open", "in_progress", "resolved", "closed"],
     default: "open"
+  },
+  adminRemarks: {
+    type: String, // Admin can leave comments
+    default: "",
   }
 }, {
   timestamps: true

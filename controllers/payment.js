@@ -96,6 +96,7 @@ import mongoose from "mongoose";
 //   }
 // };
 
+//controllers/payment.js
 export const createPayment = async (req, res) => {
   const { rideId, amount, paymentMethod, riderId } = req.body;
   const customerId = req.user.id;
@@ -196,5 +197,45 @@ export const getUserPayments = async (req, res) => {
   } catch (error) {
     console.error("Error retrieving user payments:", error);
     throw new BadRequestError("Failed to retrieve user payments");
+  }
+};
+
+
+// Get all payments (Admin only)
+export const getAllPayments = async (req, res) => {
+  try {
+    const payments = await Payment.find({})
+      .populate("customerId", "phone")
+      .populate("riderId", "phone")
+      .populate("rideId");
+
+    res.status(StatusCodes.OK).json({
+      message: "All payments retrieved successfully",
+      payments,
+      count: payments.length,
+    });
+  } catch (error) {
+    console.error("Error retrieving all payments:", error);
+    throw new BadRequestError("Failed to retrieve payments");
+  }
+};
+
+// Delete a payment (Admin only)
+export const deletePayment = async (req, res) => {
+  const { id: paymentId } = req.params;
+
+  try {
+    const payment = await Payment.findByIdAndDelete(paymentId);
+
+    if (!payment) {
+      throw new NotFoundError(`No payment found with ID ${paymentId}`);
+    }
+
+    res.status(StatusCodes.OK).json({
+      message: "Payment deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting payment:", error);
+    throw new BadRequestError("Failed to delete payment");
   }
 };

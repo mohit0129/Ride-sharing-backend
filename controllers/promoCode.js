@@ -108,3 +108,74 @@ export const validatePromoCode = async (req, res) => {
     throw new BadRequestError("Failed to validate promo code");
   }
 };
+
+// Get a promo code by ID (Admin only)
+export const getPromoCodeById = async (req, res) => {
+  const { id: promoId } = req.params;
+
+  try {
+    const promo = await PromoCode.findById(promoId);
+
+    if (!promo) {
+      throw new NotFoundError(`No promo code found with ID ${promoId}`);
+    }
+
+    res.status(StatusCodes.OK).json({
+      message: "Promo code retrieved successfully",
+      promo,
+    });
+  } catch (error) {
+    console.error("Error retrieving promo code:", error);
+    throw new BadRequestError("Failed to retrieve promo code");
+  }
+};
+
+// Update promo code status (Admin only)
+export const updatePromoCodeStatus = async (req, res) => {
+  const { id: promoId } = req.params;
+  const { status } = req.body;
+
+  if (!status || !["active", "expired"].includes(status)) {
+    throw new BadRequestError("Invalid status. Allowed values: active, expired.");
+  }
+
+  try {
+    const promo = await PromoCode.findByIdAndUpdate(
+      promoId,
+      { status },
+      { new: true, runValidators: true }
+    );
+
+    if (!promo) {
+      throw new NotFoundError(`No promo code found with ID ${promoId}`);
+    }
+
+    res.status(StatusCodes.OK).json({
+      message: "Promo code status updated successfully",
+      promo,
+    });
+  } catch (error) {
+    console.error("Error updating promo code status:", error);
+    throw new BadRequestError("Failed to update promo code status");
+  }
+};
+
+// Delete a promo code (Admin only)
+export const deletePromoCode = async (req, res) => {
+  const { id: promoId } = req.params;
+
+  try {
+    const promo = await PromoCode.findByIdAndDelete(promoId);
+
+    if (!promo) {
+      throw new NotFoundError(`No promo code found with ID ${promoId}`);
+    }
+
+    res.status(StatusCodes.OK).json({
+      message: "Promo code deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting promo code:", error);
+    throw new BadRequestError("Failed to delete promo code");
+  }
+};
