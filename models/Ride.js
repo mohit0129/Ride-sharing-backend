@@ -40,7 +40,7 @@ const rideSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["SEARCHING_FOR_RIDER", "START", "ARRIVED", "COMPLETED"],
+      enum: ["SEARCHING_FOR_RIDER", "START", "ARRIVED", "COMPLETED", "CANCELLED"],
       default: "SEARCHING_FOR_RIDER",
     },
     otp: {
