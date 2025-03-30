@@ -119,7 +119,7 @@ export const updateRideStatus = async (req, res) => {
       throw new NotFoundError("Ride not found");
     }
 
-    if (!["START", "ARRIVED", "COMPLETED"].includes(status)) {
+    if (!["START", "ARRIVED", "COMPLETED", "CANCELLED"].includes(status)) {
       throw new BadRequestError("Invalid ride status");
     }
 
@@ -216,7 +216,7 @@ export const rideStatusUpdate = async (req, res) => {
     let ride = await Ride.findById(rideId).populate("customer rider");
     if (!ride) throw new NotFoundError("Ride not found");
 
-    if (!["SEARCHING_FOR_RIDER", "START", "ARRIVED", "COMPLETED"].includes(status)) {
+    if (!["SEARCHING_FOR_RIDER", "START", "ARRIVED", "COMPLETED", "CANCELLED"].includes(status)) {
       throw new BadRequestError("Invalid ride status");
     }
 
